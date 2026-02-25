@@ -6,6 +6,8 @@ import {
   sumByKey,
   getMaxKey,
   formatSong,
+  getMostByCount,
+  getMostByTime,
 } from "./common.mjs";
 
 describe("countUsers", () => {
@@ -66,6 +68,58 @@ describe("formatSong", () => {
     assert.equal(
       formatSong({ artist: "Frank Turner", title: "Be More Kind" }),
       "Frank Turner - Be More Kind"
+    );
+  });
+});
+
+describe("getMostByCount", () => {
+  test("getMostByCount returns most common key", () => {
+    const events = [
+      { song_id: "a" },
+      { song_id: "b" },
+      { song_id: "a" },
+      { song_id: "a" },
+      { song_id: "b" },
+    ];
+    assert.equal(
+      getMostByCount(events, (e) => e.song_id),
+      "a"
+    );
+  });
+
+  test("getMostByCount returns null for empty events", () => {
+    assert.equal(
+      getMostByCount([], (e) => e.song_id),
+      null
+    );
+  });
+});
+
+describe("getMostByTime", () => {
+  test("getMostByTime returns key with highest total value", () => {
+    const events = [
+      { song_id: "a", duration: 100 },
+      { song_id: "b", duration: 300 },
+      { song_id: "a", duration: 100 },
+    ];
+    assert.equal(
+      getMostByTime(
+        events,
+        (e) => e.song_id,
+        (e) => e.duration
+      ),
+      "b"
+    );
+  });
+
+  test("getMostByTime returns null for empty events", () => {
+    assert.equal(
+      getMostByTime(
+        [],
+        (e) => e.song_id,
+        (e) => e.duration
+      ),
+      null
     );
   });
 });

@@ -36,4 +36,16 @@ export function formatSong(song) {
   return `${song.artist} - ${song.title}`;
 }
 
+// -- Question helper functions --
+
+export function getMostByCount(events, keyFn) {
+  if (events.length === 0) return null;
+  return getMaxKey(countByKey(events, keyFn));
+}
+
+export function getMostByTime(events, keyFn, timeFn) {
+  if (events.length === 0) return null;
+  return getMaxKey(sumByKey(events, keyFn, timeFn));
+}
+
 export const countUsers = () => getUserIDs().length;
