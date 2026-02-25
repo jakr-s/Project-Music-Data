@@ -1,6 +1,12 @@
 import assert from "node:assert";
 import test, { describe } from "node:test";
-import { countUsers, countByKey, sumByKey } from "./common.mjs";
+import {
+  countUsers,
+  countByKey,
+  sumByKey,
+  getMaxKey,
+  formatSong,
+} from "./common.mjs";
 
 describe("countUsers", () => {
   test("User count is correct", () => {
@@ -42,5 +48,24 @@ describe("sumByKey", () => {
       (i) => i.value
     );
     assert.deepStrictEqual(result, { a: 40, b: 20 });
+  });
+});
+
+describe("getMaxKey", () => {
+  test("getMaxKey returns the key with the highest value", () => {
+    assert.equal(getMaxKey({ a: 5, b: 10, c: 3 }), "b");
+  });
+
+  test("getMaxKey returns null for empty object", () => {
+    assert.equal(getMaxKey({}), null);
+  });
+});
+
+describe("formatSong", () => {
+  test("formatSong formats as Artist - Title", () => {
+    assert.equal(
+      formatSong({ artist: "Frank Turner", title: "Be More Kind" }),
+      "Frank Turner - Be More Kind"
+    );
   });
 });

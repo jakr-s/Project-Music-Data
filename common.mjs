@@ -20,4 +20,20 @@ export function sumByKey(items, keyFn, valueFn) {
   return sums;
 }
 
+export function getMaxKey(map) {
+  let maxKey = null;
+  let maxValue = -Infinity; // Smallest numeric possible
+  for (const [key, value] of Object.entries(map)) {
+    if (value > maxValue) {
+      maxValue = value;
+      maxKey = key;
+    }
+  }
+  return maxKey;
+}
+
+export function formatSong(song) {
+  return `${song.artist} - ${song.title}`;
+}
+
 export const countUsers = () => getUserIDs().length;
