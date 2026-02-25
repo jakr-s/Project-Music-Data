@@ -1,6 +1,6 @@
 import assert from "node:assert";
 import test, { describe } from "node:test";
-import { countUsers, countByKey } from "./common.mjs";
+import { countUsers, countByKey, sumByKey } from "./common.mjs";
 
 describe("countUsers", () => {
   test("User count is correct", () => {
@@ -26,5 +26,21 @@ describe("countByKey", () => {
       countByKey([], (x) => x),
       {}
     );
+  });
+});
+
+describe("sumByKey", () => {
+  test("sumByKey sums values correctly", () => {
+    const items = [
+      { category: "a", value: 10 },
+      { category: "b", value: 20 },
+      { category: "a", value: 30 },
+    ];
+    const result = sumByKey(
+      items,
+      (i) => i.category,
+      (i) => i.value
+    );
+    assert.deepStrictEqual(result, { a: 40, b: 20 });
   });
 });
