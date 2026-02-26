@@ -8,6 +8,8 @@ import {
   formatSong,
   getMostByCount,
   getMostByTime,
+  filterFridayNight,
+  getLongestStreak,
 } from "./common.mjs";
 
 describe("countUsers", () => {
@@ -121,5 +123,100 @@ describe("getMostByTime", () => {
       ),
       null
     );
+  });
+});
+
+describe("filterFridayNight", () => {
+  test("filterFridayNight filters correctly", () => {
+    // August 2, 2024 is a Friday
+    const events = [
+      // Fri 4pm – NOT included
+      {
+        timestamp: "2024-08-02T16:00:00",
+        seconds_since_midnight: 57600,
+        song_id: "a",
+      },
+      // Fri 5pm – included
+      {
+        timestamp: "2024-08-02T17:00:00",
+        seconds_since_midnight: 61200,
+        song_id: "b",
+      },
+      // Fri 11pm – included
+      {
+        timestamp: "2024-08-02T23:00:00",
+        seconds_since_midnight: 82800,
+        song_id: "c",
+      },
+      // Sat 3am – included
+      {
+        timestamp: "2024-08-03T03:00:00",
+        seconds_since_midnight: 10800,
+        song_id: "d",
+      },
+      // Sat 4am – NOT included
+      {
+        timestamp: "2024-08-03T04:00:00",
+        seconds_since_midnight: 14400,
+        song_id: "e",
+      },
+      // Sat 10am – NOT included
+      {
+        timestamp: "2024-08-03T10:00:00",
+        seconds_since_midnight: 36000,
+        song_id: "f",
+      },
+    ];
+    const result = filterFridayNight(events);
+    assert.equal(result.length, 3);
+    assert.deepStrictEqual(
+      result.map((e) => e.song_id),
+      ["b", "c", "d"]
+    );
+  });
+
+  test("filterFridayNight returns empty for non-Friday events", () => {
+    // August 1, 2024 is a Thursday
+    const events = [
+      {
+        timestamp: "2024-08-01T18:00:00",
+        seconds_since_midnight: 64800,
+        song_id: "a",
+      },
+    ];
+    assert.deepStrictEqual(filterFridayNight(events), []);
+  });
+});
+
+describe("getLongestStreak", () => {
+  test("getLongestStreak finds the longest consecutive run", () => {
+    const events = [
+      { song_id: "a" },
+      { song_id: "a" },
+      { song_id: "b" },
+      { song_id: "b" },
+      { song_id: "b" },
+      { song_id: "a" },
+    ];
+    const result = getLongestStreak(events);
+    assert.deepStrictEqual(result, { songIds: ["b"], length: 3 });
+  });
+
+  test("getLongestStreak handles ties", () => {
+    const events = [
+      { song_id: "a" },
+      { song_id: "a" },
+      { song_id: "b" },
+      { song_id: "b" },
+      { song_id: "c" },
+    ];
+    const result = getLongestStreak(events);
+    assert.equal(result.length, 2);
+    assert.ok(result.songIds.includes("a"));
+    assert.ok(result.songIds.includes("b"));
+  });
+
+  test("getLongestStreak returns null for empty events", () => {
+    assert.equal(getLongestStreak([]), null);
   });
 });
