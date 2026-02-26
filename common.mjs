@@ -86,4 +86,31 @@ export function getLongestStreak(events) {
   return { songIds: maxSongIds, length: maxLength };
 }
 
+export function getSongsListenedEveryDay(events) {
+  if (events.length === 0) return [];
+
+  const dayToSongs = {};
+  for (const event of events) {
+    const day = event.timestamp.split("T")[0];
+    if (!dayToSongs[day]) dayToSongs[day] = new Set();
+    dayToSongs[day].add(event.song_id);
+  }
+
+  const days = Object.keys(dayToSongs);
+  const allSongIds = [...new Set(events.map((e) => e.song_id))];
+
+  return allSongIds.filter((songId) =>
+    days.every((day) => dayToSongs[day].has(songId))
+  );
+}
+
+export function getTopGenres(events, getSongFn, maxCount = 3) {
+  if (events.length === 0) return [];
+  const genreCounts = countByKey(events, (e) => getSongFn(e.song_id).genre);
+  return Object.entries(genreCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, maxCount)
+    .map(([genre]) => genre);
+}
+
 export const countUsers = () => getUserIDs().length;

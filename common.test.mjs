@@ -10,6 +10,8 @@ import {
   getMostByTime,
   filterFridayNight,
   getLongestStreak,
+  getSongsListenedEveryDay,
+  getTopGenres,
 } from "./common.mjs";
 
 describe("countUsers", () => {
@@ -218,5 +220,65 @@ describe("getLongestStreak", () => {
 
   test("getLongestStreak returns null for empty events", () => {
     assert.equal(getLongestStreak([]), null);
+  });
+});
+
+describe("getSongsListenedEveryDay", () => {
+  test("getSongsListenedEveryDay finds songs present on all days", () => {
+    const events = [
+      { timestamp: "2024-08-01T10:00:00", song_id: "a" },
+      { timestamp: "2024-08-01T11:00:00", song_id: "b" },
+      { timestamp: "2024-08-02T10:00:00", song_id: "a" },
+      { timestamp: "2024-08-02T11:00:00", song_id: "c" },
+      { timestamp: "2024-08-03T10:00:00", song_id: "a" },
+    ];
+    assert.deepStrictEqual(getSongsListenedEveryDay(events), ["a"]);
+  });
+
+  test("getSongsListenedEveryDay returns empty when no song is on all days", () => {
+    const events = [
+      { timestamp: "2024-08-01T10:00:00", song_id: "a" },
+      { timestamp: "2024-08-02T10:00:00", song_id: "b" },
+    ];
+    assert.deepStrictEqual(getSongsListenedEveryDay(events), []);
+  });
+
+  test("getSongsListenedEveryDay returns empty for empty events", () => {
+    assert.deepStrictEqual(getSongsListenedEveryDay([]), []);
+  });
+});
+
+describe("getTopGenres", () => {
+  test("getTopGenres returns genres sorted by count", () => {
+    const mockGetSong = (id) =>
+      ({
+        s1: { genre: "Pop" },
+        s2: { genre: "Rock" },
+        s3: { genre: "Jazz" },
+      })[id];
+    const events = [
+      { song_id: "s1" },
+      { song_id: "s1" },
+      { song_id: "s1" },
+      { song_id: "s2" },
+      { song_id: "s2" },
+      { song_id: "s3" },
+    ];
+    assert.deepStrictEqual(getTopGenres(events, mockGetSong, 3), [
+      "Pop",
+      "Rock",
+      "Jazz",
+    ]);
+    assert.deepStrictEqual(getTopGenres(events, mockGetSong, 2), [
+      "Pop",
+      "Rock",
+    ]);
+  });
+
+  test("getTopGenres returns empty for empty events", () => {
+    assert.deepStrictEqual(
+      getTopGenres([], () => {}, 3),
+      []
+    );
   });
 });
